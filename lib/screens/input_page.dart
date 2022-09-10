@@ -1,10 +1,13 @@
-import 'package:bmi_calculator/input_page.dart';
+import 'package:bmi_calculator/Constants.dart';
+import 'package:bmi_calculator/components/bottom_button.dart';
+import 'package:bmi_calculator/components/icon_content.dart';
+import 'package:bmi_calculator/components/reusableCard.dart';
+import 'package:bmi_calculator/components/round_icon_button.dart';
+import 'package:bmi_calculator/screens/result_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'icon_content.dart';
-import 'reusableCard.dart';
-import 'Constants.dart';
+import 'package:bmi_calculator/calculator_brain.dart';
 
 class InputPage extends StatefulWidget {
   InputPage({Key? key}) : super(key: key);
@@ -18,6 +21,10 @@ enum Gender { male, female, def }
 class _InputPageState extends State<InputPage> {
   Gender selectedGender = Gender.def;
   int height = 180;
+  int weight = 60;
+  int age = 18;
+
+  get cardChild => null;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -56,7 +63,7 @@ class _InputPageState extends State<InputPage> {
                     colour: selectedGender == Gender.female
                         ? kActiveCardColor
                         : kInActiveCardColor,
-                    cardChild: iconContent(FontAwesomeIcons.mars, "FEMALE"),
+                    cardChild: iconContent(FontAwesomeIcons.venus, "FEMALE"),
                   ),
                 ),
               ],
@@ -98,9 +105,9 @@ class _InputPageState extends State<InputPage> {
                             thumbColor: Color(0xFFEB1555),
                             overlayColor: Color(0x29EB1555),
                             thumbShape:
-                                RoundSliderThumbShape(enabledThumbRadius: 15.0),
+                                RoundSliderThumbShape(enabledThumbRadius: 12.0),
                             overlayShape:
-                                RoundSliderOverlayShape(overlayRadius: 25.0),
+                                RoundSliderOverlayShape(overlayRadius: 22.0),
                           ),
                           child: Slider(
                             value: height.toDouble(),
@@ -126,31 +133,110 @@ class _InputPageState extends State<InputPage> {
               children: [
                 Expanded(
                   child: ReusableCard(
-                    onPress: () {
-                      selectedGender = Gender.female;
-                    },
+                    onPress: () {},
                     colour: kActiveCardColor,
-                    cardChild: iconContent(FontAwesomeIcons.venus, "FEMALE"),
+                    cardChild: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "WEIGHT",
+                          style: kLabelTextStyle,
+                        ),
+                        Text(
+                          weight.toString(),
+                          style: kNumberTextStyle,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            RoundIconButton(
+                              icon: FontAwesomeIcons.minus,
+                              onPressed: () {
+                                setState(() {
+                                  weight--;
+                                });
+                              },
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            RoundIconButton(
+                              icon: FontAwesomeIcons.plus,
+                              onPressed: () {
+                                setState(() {
+                                  weight++;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
                   child: ReusableCard(
-                    onPress: () {
-                      selectedGender = Gender.female;
-                    },
                     colour: kActiveCardColor,
-                    cardChild: iconContent(FontAwesomeIcons.venus, "FEMALE"),
+                    cardChild: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "AGE",
+                          style: kLabelTextStyle,
+                        ),
+                        Text(
+                          age.toString(),
+                          style: kNumberTextStyle,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            RoundIconButton(
+                              icon: FontAwesomeIcons.minus,
+                              onPressed: () {
+                                setState(
+                                  () {
+                                    age--;
+                                  },
+                                );
+                              },
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            RoundIconButton(
+                              icon: FontAwesomeIcons.plus,
+                              onPressed: () {
+                                setState(
+                                  () {
+                                    age++;
+                                  },
+                                );
+                              },
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                    onPress: () {},
                   ),
-                ),
+                )
               ],
             ),
           ),
-          Container(
-            color: kBottomContainerColor,
-            margin: EdgeInsets.only(top: 10),
-            width: double.infinity,
-            height: kBottomContainerHeight,
-            child: Text("okk"),
+          BottomButton(
+            buttonTitle: "CALCULATE",
+            onTap: () {
+              CalculatorBrain cal = CalculatorBrain(height, weight);
+              cal.getResult();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ResultPage(cal.calculateBMI(),
+                      cal.getResult(), cal.getInterpretation()),
+                ),
+              );
+            },
           ),
         ],
       ),
